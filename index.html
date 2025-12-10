@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Futenoid • Faculdade EnsinE</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+    <div class="stats">
+      <span class="pill">Gols: <strong id="goals">0</strong></span>
+      <span class="pill">Nível: <strong id="level">1</strong></span>
+      <span class="pill">Vidas: <strong id="lives">3</strong></span>
+      <span class="pill">Recorde: <strong id="hiscore">0</strong></span>
+      <span class="pill">Recordista: <strong id="hiscoreHolder">—</strong></span>
+    </div>
+    <div class="controls">
+      <button id="btnStart">Jogar</button>
+      <button id="btnPause" class="ghost">Pausar</button>
+      <button id="btnMute" class="alt">Som: Ligado</button>
+      <button id="btnReset" class="ghost" title="Debug">Resetar Recorde</button>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div id="stage">
+      <canvas id="game" aria-label="Arkanoid Futebol"></canvas>
+      <div id="overlay" class="overlay">
+        <div class="overlay-card">
+          <h1>⚽ Futenoid da EnsinE</h1>
+          <p>Faça a bola entrar no <strong>GOL</strong> no topo.
+          Os <em>adversários</em> e o <em>goleiro</em> se movem horizontalmente e desviam a bola.
+          Clique/Espaço lança a bola. Mova o <em>jogador</em> com o dedo/mouse ou setas ◄ ►.</p>
+          <p>Atalhos: <kbd>P</kbd> pausar • <kbd>M</kbd> som • <kbd>R</kbd> reiniciar</p>
+          <button id="overlayPlay">Começar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div>Futenoid • Faculdade EnsinE • Conheça nossos cursos, <a href="https://ensin-e.edu.br/" target="_blank"> clique aqui!</a></div>
+  </footer>
+
+<script src="game.js"></script>
+</body>
+</html>

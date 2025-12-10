@@ -1,0 +1,171 @@
+:root {
+  --bg: #0a2e13;
+  --grass1: #0e4c1f;
+  --grass2: #0b3e19;
+  --line: #ffffff;
+  --ui: #1a1f2f;
+  --text: #e8f6ff;
+  --muted: #a8c3cf;
+  --accent: #66d17a;
+  --accent2: #6aa6ff;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100dvh; /* Garante altura total no mobile */
+  width: 100vw;
+  overflow: hidden; /* Trava rolagem */
+  touch-action: none; 
+}
+
+body {
+  margin: 0;
+  /* IMPORTANTE: Padding removido aqui para não cortar o rodapé */
+  padding: 0; 
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  color: var(--text);
+  background: radial-gradient(circle at 50% 0%, #10361a 0%, #071b0d 80%);
+  
+  display: grid;
+  grid-template-rows: auto 1fr auto; /* Header, Jogo (o que sobrar), Footer */
+  gap: 0; /* Gap zerado, controlado pelo padding interno dos elementos */
+}
+
+/* Header e Footer flutuantes com espaçamento interno */
+header, footer {
+  flex-shrink: 0; /* Garante que não sejam esmagados */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding: 10px 15px; /* Espaçamento interno */
+  z-index: 10;
+}
+
+footer {
+  border-bottom: 0;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  justify-content: center; 
+  font-size: 0.75rem; 
+  color: #88a;
+}
+footer a { color: #fff; text-decoration: none; }
+
+/* Área central (o sanduíche entre header e footer) */
+.wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 10px; /* O respiro das bordas fica AQUI agora */
+  display: flex;
+  justify-content: center; /* Centraliza horizontalmente */
+  align-items: center;     /* Centraliza verticalmente */
+  overflow: hidden;
+}
+
+/* O Campo de Jogo */
+#stage {
+  position: relative;
+  /* A mágica da centralização responsiva: */
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  aspect-ratio: 9/16; /* Força o formato retangular em pé */
+  
+  margin: auto; /* Garante centralização extra */
+  border-radius: 4px;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  background: #0e4c1f;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* UI Elements */
+.stats { display: flex; gap: 8px; font-size: 0.85rem; }
+.pill { background: #101522; border: 1px solid rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 6px; color: var(--muted); white-space: nowrap; }
+.pill strong { color: var(--text); }
+
+.controls { display: flex; gap: 6px; }
+button {
+  border: 0; cursor: pointer; font-weight: 700; border-radius: 8px;
+  padding: 6px 12px; font-size: 0.8rem; white-space: nowrap;
+  color: white; background: var(--accent);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+button.ghost { background: transparent; border: 1px solid rgba(255,255,255,0.2); }
+button.alt { background: var(--accent2); }
+
+/* Overlay */
+.overlay {
+  position: absolute; inset: 0;
+  display: grid; place-items: center; text-align: center;
+  background: rgba(0, 5, 2, 0.85);
+  backdrop-filter: blur(4px);
+  z-index: 20;
+}
+.overlay-card {
+  width: 85%; max-width: 320px;
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);
+  padding: 20px; border-radius: 16px;
+}
+.overlay h1 { margin: 0 0 10px; font-size: 1.5rem; color: #fff; }
+.overlay p { font-size: 0.9rem; color: #ccc; margin-bottom: 15px; }
+
+/* --- AJUSTES MOBILE --- */
+@media (max-width: 768px) {
+  
+  /* 1. Força o Header a não estourar a largura */
+  header {
+    flex-wrap: wrap; /* Permite quebrar linha se necessário */
+    justify-content: center; /* Centraliza tudo */
+    gap: 8px; /* Reduz espaço entre blocos */
+    padding: 6px; /* Reduz enchimento interno */
+  }
+
+  /* 2. Oculta estatísticas longas no celular para economizar espaço */
+  /* Oculta o 4º e 5º item (Recorde e Recordista) */
+  .stats .pill:nth-child(4),
+  .stats .pill:nth-child(5) {
+    display: none;
+  }
+
+  /* 3. Reduz o tamanho da fonte e espaçamento dos placares */
+  .stats {
+    font-size: 0.75rem;
+    gap: 4px;
+    width: 100%; /* Força ocupar a linha para organizar */
+    justify-content: center;
+  }
+  
+  .pill {
+    padding: 2px 8px; /* Pílulas mais magrinhas */
+  }
+
+  /* 4. Botões menores e mais compactos */
+  .controls {
+    gap: 4px;
+    justify-content: center;
+    width: 100%;
+  }
+
+  button {
+    font-size: 0.75rem; /* Texto menor */
+    padding: 6px 10px; /* Botão menor */
+    flex-grow: 1; /* Faz os botões dividirem o espaço igualmente */
+  }
+  
+  /* Oculta botão de Debug (Resetar) no mobile para evitar toque acidental */
+  #btnReset {
+    display: none;
+  }
+}
