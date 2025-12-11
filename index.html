@@ -1,47 +1,215 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Futenoid • Faculdade EnsinE</title>
-<link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Footnoid Arcade</title>
+  
+  <style>
+    :root {
+      --primary: #FFD700;
+      --ad-bg: #FF8C00;
+      --bg-green: #1A8E32; /* Cor solicitada */
+      --font: system-ui, -apple-system, sans-serif;
+    }
+
+    body { 
+      margin: 0; overflow: hidden; 
+      background-color: var(--bg-green); /* Fundo verde grama */
+      font-family: var(--font); 
+      user-select: none; -webkit-user-select: none; 
+      touch-action: none;
+      display: flex; flex-direction: column; align-items: center;
+      height: 100vh; width: 100vw;
+    }
+
+    /* --- 1. BARRA SUPERIOR (100% largura) --- */
+    #top-bar {
+      width: 100%; /* Ocupa a tela toda */
+      height: 30px; /* Mais compacta */
+      background: #000;
+      color: white;
+      display: flex; justify-content: center; /* Centraliza o conteúdo */
+      align-items: center;
+      z-index: 20;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      flex-shrink: 0; /* Não deixa encolher */
+    }
+
+    /* Conteúdo limitado a 500px dentro da barra 100% */
+    .top-bar-content {
+      width: 100%; max-width: 500px;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0 15px; box-sizing: border-box;
+    }
+
+    /* Estilo linha única: "LABEL: VALOR" */
+    .stat-box { 
+      display: flex; align-items: center; gap: 6px; 
+      font-size: 13px; font-weight: 600;
+    }
+    .stat-label { 
+      font-size: 10px; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.5px; 
+    }
+    .stat-value { 
+      font-size: 14px; font-weight: 800; color: #fff; 
+    }
+    .stat-highlight { color: var(--primary); }
+
+    /* --- 2. FAIXA DE PATROCINADORES --- */
+    #ad-bar {
+      width: 100%; max-width: 700px;
+      height: 50px; /* Altura fixa */
+      flex-shrink: 0; /* IMPORTANTE: Impede que a barra seja espremida */
+      background: var(--ad-bg);
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      gap: 1px; background-color: rgba(0,0,0,0.1);
+      position: relative; 
+      z-index: 5; /* Fica abaixo do wrapper do jogo */
+    }
+    .ad-slot { 
+      background: var(--ad-bg); 
+      display: flex; align-items: center; justify-content: center; 
+      font-size: 10px; color: rgba(0,0,0,0.4); font-weight: bold; 
+      overflow: hidden; 
+    }
+    .ad-slot img { max-width: 80%; max-height: 80%; opacity: 0.8; }
+
+    /* --- 3. ÁREA DO JOGO (Responsiva) --- */
+    #game-wrapper {
+      flex: 1; /* Ocupa todo o espaço vertical restante */
+      width: 100%; max-width: 500px;
+      display: flex; align-items: flex-start; justify-content: center; /* Centraliza o jogo */
+      position: relative;
+      overflow: visible; /* Deixa o gol sair pra cima */
+      padding: 20px; /* Margem de segurança */
+      box-sizing: border-box;
+      z-index: 10; /* Garante que fique acima da ad-bar */
+    }
+
+    #game-container {
+      position: relative;
+      /* Define a proporção */
+      aspect-ratio: 360/600;
+      
+      /* Mágica da responsividade: */
+      width: auto; height: auto;
+      max-width: 100%; 
+      max-height: 100%; /* Nunca ultrapassa a altura disponível */
+      
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      border: 2px solid white;
+      background: #1a8e32;
+      z-index: 1;
+      overflow: visible;
+    }
+
+    /* REDE DO GOL */
+    #goal-net {
+      position: absolute;
+      width: 36%;
+      left: 50%; transform: translateX(-50%);
+      top: -45px; /* Ajuste visual para cair sobre a ad-bar */
+      z-index: 20;
+      pointer-events: none;
+      filter: drop-shadow(0 5px 5px rgba(0,0,0,0.3));
+    }
+
+    canvas { display: block; width: 100%; height: 100%; }
+
+    /* --- OVERLAY --- */
+    #overlay {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
+      background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
+      display: flex; align-items: center; justify-content: center; z-index: 200;
+    }
+    .card {
+      background: linear-gradient(135deg, #1e232d, #0f0f0f);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 24px; padding: 30px; width: 85%; max-width: 320px;
+      text-align: center; color: white;
+      display: flex; flex-direction: column; gap: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .menu-title { margin: 0; font-size: 28px; background: linear-gradient(to right, #fff, #bbb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .flash-text { color: white; font-weight: 800; font-size: 28px; text-shadow: 0 2px 0 #000; white-space: pre-wrap; }
+    p { margin: 0; opacity: 0.7; font-size: 14px; color: #ccc; }
+    
+    .btn-primary {
+      background: linear-gradient(to bottom, #4CAF50, #2E7D32); border: none; border-radius: 12px;
+      color: white; font-size: 18px; font-weight: 700; padding: 16px; width: 100%; cursor: pointer;
+      box-shadow: 0 4px 0 #1B5E20; transition: transform 0.1s;
+    }
+    .btn-primary:active { transform: translateY(4px); box-shadow: 0 0 0 #1B5E20; }
+    .btn-row { display: flex; gap: 12px; justify-content: center; margin-top: 5px; }
+    .btn-icon {
+      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.05); color: #ddd;
+      border-radius: 12px; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; cursor: pointer;
+    }
+    .btn-icon svg { width: 24px; height: 24px; fill: currentColor; }
+    #ovName {
+      background: rgba(0,0,0,0.4); border: 2px solid rgba(255,255,255,0.1); color: white; padding: 12px;
+      border-radius: 10px; font-size: 16px; text-align: center; width: 100%; box-sizing: border-box; outline: none;
+    }
+    #ovName:focus { border-color: var(--primary); }
+    [hidden] { display: none !important; }
+    @keyframes popIn { from{ opacity: 0; transform: scale(0.9); } to{ opacity: 1; transform: scale(1); } }
+  </style>
 </head>
 <body>
-<header>
-    <div class="stats">
-      <span class="pill">Gols: <strong id="goals">0</strong></span>
-      <span class="pill">Nível: <strong id="level">1</strong></span>
-      <span class="pill">Vidas: <strong id="lives">3</strong></span>
-      <span class="pill">Recorde: <strong id="hiscore">0</strong></span>
-      <span class="pill">Recordista: <strong id="hiscoreHolder">—</strong></span>
-    </div>
-    <div class="controls">
-      <button id="btnStart">Jogar</button>
-      <button id="btnPause" class="ghost">Pausar</button>
-      <button id="btnMute" class="alt">Som: Ligado</button>
-      <button id="btnReset" class="ghost" title="Debug">Resetar Recorde</button>
-    </div>
-  </header>
 
-  <div class="wrap">
-    <div id="stage">
-      <canvas id="game" aria-label="Arkanoid Futebol"></canvas>
-      <div id="overlay" class="overlay">
-        <div class="overlay-card">
-          <h1>⚽ Futenoid da EnsinE</h1>
-          <p>Faça a bola entrar no <strong>GOL</strong> no topo.
-          Os <em>adversários</em> e o <em>goleiro</em> se movem horizontalmente e desviam a bola.
-          Clique/Espaço lança a bola. Mova o <em>jogador</em> com o dedo/mouse ou setas ◄ ►.</p>
-          <p>Atalhos: <kbd>P</kbd> pausar • <kbd>M</kbd> som • <kbd>R</kbd> reiniciar</p>
-          <button id="overlayPlay">Começar</button>
-        </div>
-      </div>
+<div id="top-bar">
+  <div class="top-bar-content">
+    <div class="stat-box">
+      <span class="stat-label">VIDAS:</span>
+      <span class="stat-value" id="lives">3</span>
+    </div>
+    
+    <div class="stat-box">
+      <span class="stat-label">RECORDE:</span>
+      <span class="stat-value stat-highlight" id="hud-hiscore">0</span>
+      <span class="stat-label" style="opacity: 0.5;">-</span>
+      <span class="stat-label" style="opacity: 1; font-weight:bold;" id="hud-hiscore-name">—</span>
+    </div>
+
+    <div class="stat-box">
+      <span class="stat-label">GOLS:</span>
+      <span class="stat-value" id="goals">0</span>
     </div>
   </div>
+</div>
 
-  <footer>
-    <div>Futenoid • Faculdade EnsinE • Conheça nossos cursos, <a href="https://ensin-e.edu.br/" target="_blank"> clique aqui!</a></div>
-  </footer>
+<div id="ad-bar">
+  <div class="ad-slot"><img src="logo.png"></div>
+  <div class="ad-slot"><img src="logo.png"></div>
+  <div class="ad-slot"><img src="logo.png"></div>
+</div>
+
+<div id="game-wrapper">
+    <div id="game-container">
+        <img id="goal-net" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'%3E%3Cpath d='M10,95 L10,5 L190,5 L190,95' fill='none' stroke='white' stroke-width='4'/%3E%3Cpath d='M10,5 L30,30 L170,30 L190,5' fill='none' stroke='white' stroke-width='2' opacity='0.7'/%3E%3Cpattern id='net' x='0' y='0' width='20' height='20' patternUnits='userSpaceOnUse'%3E%3Cpath d='M0,0 L20,20 M20,0 L0,20' stroke='white' stroke-width='1' opacity='0.5'/%3E%3C/pattern%3E%3Cpath d='M10,5 L190,5 L170,30 L30,30 Z' fill='url(%23net)' opacity='0.5'/%3E%3Cpath d='M10,95 L10,30 L190,30 L190,95' fill='none' stroke='white' stroke-width='2' opacity='0.3'/%3E%3C/svg%3E" alt="Rede">
+        <canvas id="game"></canvas>
+    </div>
+</div>
+
+<div id="overlay">
+  <div class="card overlay-card">
+    <h1 class="menu-title">FOOTNOID</h1>
+    <p>Futebol Arcade</p>
+    <button id="btnStart" class="btn-primary">JOGAR</button>
+    <button id="btnPause" class="btn-primary" style="display:none; background: linear-gradient(to bottom, #e7a31d, #c5860e); box-shadow: 0 4px 0 #8f6008;">RETOMAR</button>
+    <div class="btn-row">
+      <button id="btnMute" class="btn-icon">
+        <svg id="icon-sound-on" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+        <svg id="icon-sound-off" viewBox="0 0 24 24" style="display:none"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73 4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+      </button>
+      <button id="btnReset" class="btn-icon"><svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button>
+    </div>
+    <p style="font-size:11px; opacity:0.4;">Toque para controlar</p>
+  </div>
+  <div id="overlayPlay" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:-1;"></div>
+</div>
 
 <script src="game.js"></script>
 </body>
