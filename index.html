@@ -9,109 +9,92 @@
     :root {
       --primary: #FFD700;
       --ad-bg: #FF8C00;
-      --bg-green: #1A8E32; /* Cor solicitada */
+      --bg-green: #1A8E32;
       --font: system-ui, -apple-system, sans-serif;
     }
 
     body { 
       margin: 0; overflow: hidden; 
-      background-color: var(--bg-green); /* Fundo verde grama */
+      background-color: var(--bg-green);
       font-family: var(--font); 
       user-select: none; -webkit-user-select: none; 
       touch-action: none;
       display: flex; flex-direction: column; align-items: center;
-      height: 100vh; width: 100vw;
+      /* AJUSTE 1: dvh para considerar barras do navegador mobile */
+      height: 100vh; height: 100dvh; 
+      width: 100vw;
     }
 
-    /* --- 1. BARRA SUPERIOR (100% largura) --- */
+    /* --- 1. BARRA SUPERIOR --- */
     #top-bar {
-      width: 100%; /* Ocupa a tela toda */
-      height: 30px; /* Mais compacta */
-      background: #000;
-      color: white;
-      display: flex; justify-content: center; /* Centraliza o conteúdo */
-      align-items: center;
-      z-index: 20;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-      flex-shrink: 0; /* Não deixa encolher */
+      width: 100%; height: 30px; background: #000; color: white;
+      display: flex; justify-content: center; align-items: center;
+      z-index: 20; border-bottom: 1px solid rgba(255,255,255,0.1);
+      flex-shrink: 0;
     }
-
-    /* Conteúdo limitado a 500px dentro da barra 100% */
     .top-bar-content {
       width: 100%; max-width: 500px;
       display: flex; justify-content: space-between; align-items: center;
       padding: 0 15px; box-sizing: border-box;
     }
-
-    /* Estilo linha única: "LABEL: VALOR" */
-    .stat-box { 
-      display: flex; align-items: center; gap: 6px; 
-      font-size: 13px; font-weight: 600;
-    }
-    .stat-label { 
-      font-size: 10px; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.5px; 
-    }
-    .stat-value { 
-      font-size: 14px; font-weight: 800; color: #fff; 
-    }
+    .stat-box { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; }
+    .stat-label { font-size: 10px; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-value { font-size: 14px; font-weight: 800; color: #fff; }
     .stat-highlight { color: var(--primary); }
 
     /* --- 2. FAIXA DE PATROCINADORES --- */
     #ad-bar {
-      width: 100%; max-width: 700px;
-      height: 50px; /* Altura fixa */
-      flex-shrink: 0; /* IMPORTANTE: Impede que a barra seja espremida */
+      width: 100%; max-width: 700px; height: 50px; flex-shrink: 0;
       background: var(--ad-bg);
       display: grid; grid-template-columns: 1fr 1fr 1fr;
       gap: 1px; background-color: rgba(0,0,0,0.1);
-      position: relative; 
-      z-index: 5; /* Fica abaixo do wrapper do jogo */
+      position: relative; z-index: 5;
     }
     .ad-slot { 
-      background: var(--ad-bg); 
-      display: flex; align-items: center; justify-content: center; 
-      font-size: 10px; color: rgba(0,0,0,0.4); font-weight: bold; 
-      overflow: hidden; 
+      background: var(--ad-bg); display: flex; align-items: center; justify-content: center; 
+      font-size: 10px; color: rgba(0,0,0,0.4); font-weight: bold; overflow: hidden; 
     }
-    .ad-slot img { max-width: 80%; max-height: 80%; opacity: 0.8; }
+    /* Limita o tamanho da imagem do patrocinador para não estourar */
+    .ad-slot img { max-width: 90%; max-height: 90%; object-fit: contain; opacity: 0.8; }
 
-    /* --- 3. ÁREA DO JOGO (Responsiva) --- */
+    /* --- 3. ÁREA DO JOGO (CORREÇÃO DE CORTE) --- */
     #game-wrapper {
       flex: 1; /* Ocupa todo o espaço vertical restante */
-      width: 100%; max-width: 500px;
-      display: flex; align-items: flex-start; justify-content: center; /* Centraliza o jogo */
+      width: 100%; 
+      /* AJUSTE 2: Centraliza verticalmente e horizontalmente */
+      display: flex; align-items: center; justify-content: center;
       position: relative;
-      overflow: visible; /* Deixa o gol sair pra cima */
-      padding: 20px; /* Margem de segurança */
+      overflow: hidden; /* Garante que nada gere scroll */
+      /* Reduzi o padding para 10px para ganhar espaço em telas pequenas */
+      padding: 10px; 
       box-sizing: border-box;
-      z-index: 10; /* Garante que fique acima da ad-bar */
+      z-index: 10;
     }
 
     #game-container {
       position: relative;
-      /* Define a proporção */
+      /* Define a proporção do campo */
       aspect-ratio: 360/600;
       
-      /* Mágica da responsividade: */
-      width: auto; height: auto;
-      max-width: 100%; 
-      max-height: 100%; /* Nunca ultrapassa a altura disponível */
+      /* AJUSTE 3: A mágica para nunca cortar */
+      /* Tenta ser o maior possível, mas respeita o limite de largura E altura do pai */
+      width: auto;
+      height: auto;
+      max-width: 100%;
+      max-height: 100%; 
       
       box-shadow: 0 10px 40px rgba(0,0,0,0.5);
       border: 2px solid white;
       background: #1a8e32;
       z-index: 1;
-      overflow: visible;
+      overflow: visible; /* Permite que a rede do gol saia para cima */
     }
 
     /* REDE DO GOL */
     #goal-net {
-      position: absolute;
-      width: 36%;
+      position: absolute; width: 36%;
       left: 50%; transform: translateX(-50%);
-      top: -45px; /* Ajuste visual para cair sobre a ad-bar */
-      z-index: 20;
-      pointer-events: none;
+      top: -45px; z-index: 20; pointer-events: none;
       filter: drop-shadow(0 5px 5px rgba(0,0,0,0.3));
     }
 
@@ -133,7 +116,6 @@
       animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     .menu-title { margin: 0; font-size: 28px; background: linear-gradient(to right, #fff, #bbb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .flash-text { color: white; font-weight: 800; font-size: 28px; text-shadow: 0 2px 0 #000; white-space: pre-wrap; }
     p { margin: 0; opacity: 0.7; font-size: 14px; color: #ccc; }
     
     .btn-primary {
@@ -181,9 +163,9 @@
 </div>
 
 <div id="ad-bar">
-  <div class="ad-slot"><img src="logo.png"></div>
-  <div class="ad-slot"><img src="logo.png"></div>
-  <div class="ad-slot"><img src="logo.png"></div>
+  <div class="ad-slot"><img src="logo.png" alt="Patrocínio"></div>
+  <div class="ad-slot"><img src="logo.png" alt="Patrocínio"></div>
+  <div class="ad-slot"><img src="logo.png" alt="Patrocínio"></div>
 </div>
 
 <div id="game-wrapper">
