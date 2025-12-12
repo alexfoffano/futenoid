@@ -20,12 +20,11 @@
       user-select: none; -webkit-user-select: none; 
       touch-action: none;
       display: flex; flex-direction: column; align-items: center;
-      /* AJUSTE 1: dvh para considerar barras do navegador mobile */
       height: 100vh; height: 100dvh; 
       width: 100vw;
     }
 
-    /* --- 1. BARRA SUPERIOR --- */
+    /* --- BARRA SUPERIOR --- */
     #top-bar {
       width: 100%; height: 30px; background: #000; color: white;
       display: flex; justify-content: center; align-items: center;
@@ -42,7 +41,7 @@
     .stat-value { font-size: 14px; font-weight: 800; color: #fff; }
     .stat-highlight { color: var(--primary); }
 
-    /* --- 2. FAIXA DE PATROCINADORES --- */
+    /* --- PATROCINADORES --- */
     #ad-bar {
       width: 100%; max-width: 700px; height: 50px; flex-shrink: 0;
       background: var(--ad-bg);
@@ -54,47 +53,46 @@
       background: var(--ad-bg); display: flex; align-items: center; justify-content: center; 
       font-size: 10px; color: rgba(0,0,0,0.4); font-weight: bold; overflow: hidden; 
     }
-    /* Limita o tamanho da imagem do patrocinador para não estourar */
     .ad-slot img { max-width: 90%; max-height: 90%; object-fit: contain; opacity: 0.8; }
 
-    /* --- 3. ÁREA DO JOGO (CORREÇÃO DE CORTE) --- */
+    /* --- ÁREA DO JOGO --- */
     #game-wrapper {
-      flex: 1; /* Ocupa todo o espaço vertical restante */
+      flex: 1; 
       width: 100%; 
-      /* AJUSTE 2: Centraliza verticalmente e horizontalmente */
-      display: flex; align-items: center; justify-content: center;
+      /* Alinha no topo como pedido */
+      display: flex; align-items: flex-start; justify-content: center;
       position: relative;
-      overflow: hidden; /* Garante que nada gere scroll */
-      /* Reduzi o padding para 10px para ganhar espaço em telas pequenas */
-      padding: 10px; 
+      /* Oculta o que vazar da tela */
+      overflow: hidden; 
+      /* Padding lateral e inferior de 20px */
+      padding: 0 20px 20px 20px;
+      /* TRUQUE DA TRAVE: Padding Top extra (60px) para a rede caber dentro do wrapper sem ser cortada */
+      padding-top: 60px; 
+	  margin-top: -40px;
       box-sizing: border-box;
       z-index: 10;
     }
 
     #game-container {
       position: relative;
-      /* Define a proporção do campo */
       aspect-ratio: 360/600;
-      
-      /* AJUSTE 3: A mágica para nunca cortar */
-      /* Tenta ser o maior possível, mas respeita o limite de largura E altura do pai */
-      width: auto;
-      height: auto;
-      max-width: 100%;
-      max-height: 100%; 
+      /* Ocupa o máximo possível respeitando o padding do wrapper */
+      width: auto; height: auto;
+      max-width: 100%; max-height: 100%; 
       
       box-shadow: 0 10px 40px rgba(0,0,0,0.5);
       border: 2px solid white;
       background: #1a8e32;
       z-index: 1;
-      overflow: visible; /* Permite que a rede do gol saia para cima */
+      overflow: visible; /* Deixa a rede "sair" do quadrado verde */
     }
 
     /* REDE DO GOL */
     #goal-net {
       position: absolute; width: 36%;
       left: 50%; transform: translateX(-50%);
-      top: -45px; z-index: 20; pointer-events: none;
+      top: -45px; /* Sobe visualmente */
+      z-index: 20; pointer-events: none;
       filter: drop-shadow(0 5px 5px rgba(0,0,0,0.3));
     }
 
@@ -130,11 +128,15 @@
       border-radius: 12px; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; cursor: pointer;
     }
     .btn-icon svg { width: 24px; height: 24px; fill: currentColor; }
-    #ovName {
-      background: rgba(0,0,0,0.4); border: 2px solid rgba(255,255,255,0.1); color: white; padding: 12px;
-      border-radius: 10px; font-size: 16px; text-align: center; width: 100%; box-sizing: border-box; outline: none;
+    
+    /* Input Style (garantir que apareça bonito) */
+    .input-record {
+      width: 100%; padding: 12px; border-radius: 10px; 
+      border: 2px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4); 
+      color: white; font-size: 16px; text-align: center; box-sizing: border-box; outline: none;
     }
-    #ovName:focus { border-color: var(--primary); }
+    .input-record:focus { border-color: var(--primary); }
+
     [hidden] { display: none !important; }
     @keyframes popIn { from{ opacity: 0; transform: scale(0.9); } to{ opacity: 1; transform: scale(1); } }
   </style>
